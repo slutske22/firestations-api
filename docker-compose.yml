@@ -1,0 +1,13 @@
+# Quick dockefile to set up server stack, which includes DB image, as well as
+# build-on-command api container
+
+version: "1"
+name: "firestations"
+
+services:
+  public_api:
+    # for local dev building
+    build: .
+    image: firestations_api_dev_image
+    ports:
+      - 9770:9770
