@@ -1,6 +1,9 @@
 use actix_web::{self, App, HttpServer};
 use tracing_subscriber;
 
+mod auth;
+mod station;
+
 pub static BIND_ADDRESS: &str = if cfg!(debug_assertions) {
     "127.0.0.1"
 } else {
