@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 
 /// Information about a firestation via the FEMA database, geocoded by Geocodio in 2019
-#[derive(Serialize, Deserialize)]
-struct FireStation {
+#[derive(Serialize, Deserialize, Debug)]
+pub struct FireStation {
     /// The database id of the entry
     _id: String,
     /// The Fire Department ID
