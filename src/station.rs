@@ -1,7 +1,15 @@
+use actix_web::{
+    get,
+    web::{self, Query},
+    HttpRequest, HttpResponse, Responder,
+};
 use serde::{Deserialize, Serialize};
+use utoipa::{self, ToSchema};
+
+use crate::AppState;
 
 /// Information about a firestation via the FEMA database, geocoded by Geocodio in 2019
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
 pub struct FireStation {
     /// The database id of the entry
     _id: String,
@@ -75,4 +83,31 @@ pub struct FireStation {
     /// Accuracy score of the geocodio geocoding result
     #[serde(rename = "Accuracy Score")]
     accuracy_score: f32,
+}
+
+/// Query parameters that can be sent with GET request to filter results
+#[derive(Serialize, Deserialize, Debug, ToSchema)]
+struct QueryParams {
+    minlat: f64,
+    maxlat: f64,
+    minlng: f64,
+    maxlng: f64,
+}
+
+/// Get all existing [RadioPlan] records.
+#[utoipa::path(
+  get,
+  path = "/v1/stations",
+  tag = "Plans",
+  responses(
+      (status = 200, description = "success", body = Vec<FireStation>),
+      (status = 500, description = "internal server error", body = String),
+  )
+)]
+#[get("/v1/stations")]
+pub async fn list(req: HttpRequest, state: web::Data<AppState>) -> impl Responder {
+    let query_string = Query::<QueryParams>::from_query(req.query_string()).unwrap();
+    tracing::debug!("Query string is {:?}", query_string);
+
+    HttpResponse::Ok().json({})
 }

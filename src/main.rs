@@ -1,12 +1,10 @@
 use crate::station::FireStation;
 use actix_web::{self, web, App, HttpServer};
-use mongodb::{
-    bson::{doc, Document},
-    Client, Collection,
-};
-use tracing_subscriber;
+use logging::initialize_tracing;
+use mongodb::{bson::doc, Client, Collection};
 
 mod auth;
+mod logging;
 mod station;
 
 pub static BIND_ADDRESS: &str = if cfg!(debug_assertions) {
@@ -26,7 +24,7 @@ pub struct AppState {
 
 #[actix_web::main]
 async fn main() -> anyhow::Result<()> {
-    tracing_subscriber::fmt::init();
+    initialize_tracing(Some("firestations_api_rust=debug"));
 
     tracing::info!("🎧🎧🎧 Starting Firestations API on port: {BIND_PORT}");
 
@@ -51,7 +49,8 @@ async fn main() -> anyhow::Result<()> {
     HttpServer::new(move || {
         let app = App::new()
             .app_data(app_state.clone())
-            .app_data(collection.clone());
+            .app_data(collection.clone())
+            .service(station::list);
 
         return app;
     })
