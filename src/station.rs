@@ -94,11 +94,11 @@ struct QueryParams {
     maxlng: f64,
 }
 
-/// Get all existing [RadioPlan] records.
+/// Get all existing [FireStation] records.
 #[utoipa::path(
   get,
   path = "/v1/stations",
-  tag = "Plans",
+  tag = "Stations",
   responses(
       (status = 200, description = "success", body = Vec<FireStation>),
       (status = 500, description = "internal server error", body = String),

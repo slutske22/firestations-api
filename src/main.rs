@@ -1,10 +1,13 @@
-use crate::station::FireStation;
+use crate::{openapi::ApiDoc, station::FireStation};
 use actix_web::{self, web, App, HttpServer};
 use logging::initialize_tracing;
 use mongodb::{bson::doc, Client, Collection};
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
 mod auth;
 mod logging;
+mod openapi;
 mod station;
 
 pub static BIND_ADDRESS: &str = if cfg!(debug_assertions) {
@@ -50,7 +53,11 @@ async fn main() -> anyhow::Result<()> {
         let app = App::new()
             .app_data(app_state.clone())
             .app_data(collection.clone())
-            .service(station::list);
+            .service(station::list)
+            .service(
+                SwaggerUi::new("/swagger-ui/{_:.*}")
+                    .url("/api-docs/openapi.json", ApiDoc::openapi()),
+            );
 
         return app;
     })
