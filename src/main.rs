@@ -36,13 +36,13 @@ async fn main() -> anyhow::Result<()> {
 
     // Ping Atlas MongoDB to test connection
     client
-        .database("FSCluster")
+        .database("FireStarter")
         .run_command(doc! {"ping": 1}, None)
         .await?;
     tracing::info!("🍃 Successfully connection to MongoDB Atlas Server");
 
-    let database = client.database("sample_mflix");
-    let collection: Collection<FireStation> = database.collection("movies");
+    let database = client.database("FireStarter");
+    let collection: Collection<FireStation> = database.collection("FEMA_stations");
 
     let app_state = web::Data::new(AppState {
         client,

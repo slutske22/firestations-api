@@ -3,6 +3,8 @@ use actix_web::{
     web::{self, Query},
     HttpRequest, HttpResponse, Responder,
 };
+use futures::TryStreamExt;
+use mongodb::bson::doc;
 use serde::{Deserialize, Serialize};
 use utoipa::{self, ToSchema};
 
@@ -108,6 +110,20 @@ struct QueryParams {
 pub async fn list(req: HttpRequest, state: web::Data<AppState>) -> impl Responder {
     let query_string = Query::<QueryParams>::from_query(req.query_string()).unwrap();
     tracing::debug!("Query string is {:?}", query_string);
+
+    match state.collection.find(doc! { "HQ State": "OR" }, None).await {
+        Ok(cursor) => match cursor.try_collect::<Vec<FireStation>>().await {
+            Ok(stations) => {
+                println!("{:?}", stations)
+            }
+            Err(e) => {
+                tracing::error!("Couldn't collect stations {:?}", e)
+            }
+        },
+        Err(e) => {
+            tracing::error!("Couldn't get stations! {:?}", e)
+        }
+    }
 
     HttpResponse::Ok().json({})
 }
